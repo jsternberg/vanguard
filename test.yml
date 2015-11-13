@@ -1,0 +1,5 @@
+---
+tasks:
+  - file:
+      path: test.yml
+      mode: 0644

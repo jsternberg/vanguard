@@ -44,7 +44,10 @@ func (r *Runner) prepare() {
 func (r *Runner) execute() {
 	defer r.wg.Done()
 	for task := range r.executeCh {
-		task.Run()
+		changed, err := task.Prepare()
+		if changed && err == nil {
+			task.Run()
+		}
 	}
 }
 
