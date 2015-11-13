@@ -3,12 +3,14 @@ package vanguard
 import (
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 type mock struct {
 	count int
+	delay time.Duration
 }
 
 func (m *mock) Prepare(config interface{}) (bool, error) {
@@ -17,6 +19,9 @@ func (m *mock) Prepare(config interface{}) (bool, error) {
 }
 
 func (m *mock) Run() error {
+	if m.delay > 0 {
+		time.Sleep(m.delay)
+	}
 	return nil
 }
 
