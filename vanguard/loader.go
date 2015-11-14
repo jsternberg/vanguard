@@ -48,11 +48,9 @@ func (l *YamlLoader) Load(r io.Reader) (*Plan, error) {
 		}
 
 		name := config.Metadata.Unused[0]
-		switch name {
-		case "file":
-			task.module = File()
-		default:
-			return nil, fmt.Errorf("unknown module: %s", name)
+		task.module, err = DefaultModuleFactory.New(name)
+		if err != nil {
+			return nil, err
 		}
 		task.config = rawTask[name]
 
