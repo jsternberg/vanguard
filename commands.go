@@ -6,6 +6,9 @@ import (
 )
 
 var Commands = map[string]cli.CommandFactory{
+	"agent": func() (cli.Command, error) {
+		return &command.AgentCommand{}, nil
+	},
 	"exec": func() (cli.Command, error) {
 		return &command.ExecCommand{}, nil
 	},
