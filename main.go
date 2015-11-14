@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jsternberg/vanguard/vanguard"
 	"github.com/mitchellh/cli"
 )
 
 func realMain() int {
-	app := cli.NewCLI("vanguard", Version)
+	app := cli.NewCLI("vanguard", vanguard.Version)
 	app.Args = os.Args[1:]
 	app.Commands = Commands
 
