@@ -3,9 +3,12 @@ package vanguard
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,7 +36,7 @@ func (f *serverFixture) SendRequest(method, path string, body interface{}) bool 
 	assert := assert.New(f.t)
 
 	var r io.Reader
-	if body == nil {
+	if body != nil {
 		switch obj := body.(type) {
 		case string:
 			r = bytes.NewBufferString(obj)
@@ -72,5 +75,33 @@ func TestServerPing(t *testing.T) {
 	if assert.Equal(200, f.res.Code) {
 		serverInfo := f.Json().(map[string]interface{})
 		assert.Equal(Version, serverInfo["version"])
+	}
+}
+
+func TestServerProvision(t *testing.T) {
+	assert := assert.New(t)
+
+	tmpfile, err := ioutil.TempFile(os.TempDir(), "vanguard-test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmpfile.Chmod(0400)
+	tmpfile.Close()
+	defer os.Remove(tmpfile.Name())
+
+	yamlFile := fmt.Sprintf(`---
+tasks:
+  - name: modify tmpfile
+    file:
+      path: "%s"
+      mode: 0644
+`, tmpfile.Name())
+
+	f := ServerFixture(t)
+	f.SendRequest("POST", "/v1/provision", yamlFile)
+
+	st, err := os.Stat(tmpfile.Name())
+	if assert.NoError(err) {
+		assert.Equal(os.FileMode(0644), st.Mode())
 	}
 }
