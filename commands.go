@@ -12,4 +12,7 @@ var Commands = map[string]cli.CommandFactory{
 	"exec": func() (cli.Command, error) {
 		return &command.ExecCommand{}, nil
 	},
+	"run": func() (cli.Command, error) {
+		return &command.RunCommand{}, nil
+	},
 }
