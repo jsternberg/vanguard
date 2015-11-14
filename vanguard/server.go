@@ -106,6 +106,13 @@ func (s *Server) wait(params martini.Params) int {
 	if !ok {
 		return http.StatusNotFound
 	}
-	ctx.runner.Wait()
+
+	ctx.lock.RLock()
+	runner := ctx.runner
+	ctx.lock.RUnlock()
+
+	if runner != nil {
+		runner.Wait()
+	}
 	return http.StatusOK
 }
