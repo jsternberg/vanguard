@@ -11,7 +11,7 @@ type ModuleFunc func() Module
 type ModuleFactory interface {
 	New(name string) (Module, error)
 
-	Register(name string, f ModuleFunc)
+	Register(f ModuleFunc)
 }
 
 type moduleFactory struct {
@@ -26,7 +26,8 @@ func (mf *moduleFactory) New(name string) (Module, error) {
 	return f(), nil
 }
 
-func (mf *moduleFactory) Register(name string, f ModuleFunc) {
+func (mf *moduleFactory) Register(f ModuleFunc) {
+	name := f().Name()
 	_, ok := mf.builtins[name]
 	if ok {
 		fmt.Printf("warning: registered %s multiple times\n", name)
@@ -35,5 +36,5 @@ func (mf *moduleFactory) Register(name string, f ModuleFunc) {
 }
 
 func init() {
-	DefaultModuleFactory.Register("file", File)
+	DefaultModuleFactory.Register(File)
 }

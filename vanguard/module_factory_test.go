@@ -12,7 +12,7 @@ func TestModuleFactory(t *testing.T) {
 	mf := &moduleFactory{
 		builtins: make(map[string]ModuleFunc),
 	}
-	mf.Register("mock", func() Module { return &mock{} })
+	mf.Register(func() Module { return &mock{} })
 
 	module, err := mf.New("mock")
 	if assert.NoError(err) {

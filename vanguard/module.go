@@ -7,6 +7,9 @@ import (
 )
 
 type Module interface {
+	// Unique name of the module
+	Name() string
+
 	Prepare(config interface{}) (bool, error)
 
 	Run() error
@@ -19,6 +22,10 @@ type file struct {
 
 func File() Module {
 	return &file{}
+}
+
+func (file *file) Name() string {
+	return "file"
 }
 
 func (file *file) Prepare(config interface{}) (bool, error) {

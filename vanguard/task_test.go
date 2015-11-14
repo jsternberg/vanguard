@@ -13,6 +13,10 @@ type mock struct {
 	delay time.Duration
 }
 
+func (m *mock) Name() string {
+	return "mock"
+}
+
 func (m *mock) Prepare(config interface{}) (bool, error) {
 	m.count++
 	return true, nil
