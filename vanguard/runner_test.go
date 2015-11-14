@@ -25,4 +25,5 @@ func TestRunner(t *testing.T) {
 	for _, m := range modules {
 		assert.Equal(1, m.count)
 	}
+	runner.Wait()
 }

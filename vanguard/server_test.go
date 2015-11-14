@@ -29,11 +29,12 @@ func ServerFixture(t *testing.T) *serverFixture {
 func (f *serverFixture) SetUp(t *testing.T) {
 	f.t = t
 	f.s = NewServer()
-	f.res = httptest.NewRecorder()
 }
 
 func (f *serverFixture) SendRequest(method, path string, body interface{}) bool {
 	assert := assert.New(f.t)
+
+	f.res = httptest.NewRecorder()
 
 	var r io.Reader
 	if body != nil {
@@ -99,6 +100,9 @@ tasks:
 
 	f := ServerFixture(t)
 	f.SendRequest("POST", "/v1/provision", yamlFile)
+
+	assert.Equal(http.StatusOK, f.res.Code)
+	f.SendRequest("GET", fmt.Sprintf("/v1/runs/%s/wait", f.res.Body.String()), nil)
 
 	st, err := os.Stat(tmpfile.Name())
 	if assert.NoError(err) {
