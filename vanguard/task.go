@@ -1,6 +1,10 @@
 package vanguard
 
-import "sync"
+import (
+	"fmt"
+	"io"
+	"sync"
+)
 
 type Task struct {
 	Name string
@@ -32,6 +36,7 @@ func (t *Task) Prepare() (bool, error) {
 	return t.changed, t.err
 }
 
-func (t *Task) Run() error {
+func (t *Task) Run(w io.Writer) error {
+	fmt.Fprintf(w, "Running %s[%s]\n", t.module.Name(), t.Name)
 	return t.module.Run()
 }

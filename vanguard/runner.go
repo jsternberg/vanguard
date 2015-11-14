@@ -1,9 +1,14 @@
 package vanguard
 
-import "sync"
+import (
+	"io"
+	"io/ioutil"
+	"sync"
+)
 
 type Runner struct {
 	C chan *Task
+	w io.Writer
 
 	prepareCh chan *Task
 	executeCh chan *Task
@@ -11,9 +16,14 @@ type Runner struct {
 	wg sync.WaitGroup
 }
 
-func NewRunner() *Runner {
+func NewRunner(w io.Writer) *Runner {
+	if w == nil {
+		w = ioutil.Discard
+	}
+
 	r := &Runner{
 		C:         make(chan *Task, 100),
+		w:         w,
 		prepareCh: make(chan *Task, 100),
 		executeCh: make(chan *Task, 100),
 	}
@@ -46,7 +56,7 @@ func (r *Runner) execute() {
 	for task := range r.executeCh {
 		changed, err := task.Prepare()
 		if changed && err == nil {
-			task.Run()
+			task.Run(r.w)
 		}
 	}
 }

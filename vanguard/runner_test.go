@@ -15,7 +15,7 @@ func TestRunner(t *testing.T) {
 		&mock{delay: 100 * time.Millisecond},
 	}
 
-	runner := NewRunner()
+	runner := NewRunner(nil)
 	for _, m := range modules {
 		runner.C <- NewTask(m, nil)
 	}

@@ -33,7 +33,7 @@ func (c *ExecCommand) Run(args []string) int {
 		return 1
 	}
 
-	runner := vanguard.NewRunner()
+	runner := vanguard.NewRunner(os.Stdout)
 	for _, task := range plan.Tasks {
 		runner.C <- task
 	}
