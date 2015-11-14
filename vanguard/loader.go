@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
 )
 
@@ -27,22 +28,35 @@ func (l *YamlLoader) Load(r io.Reader) (*Plan, error) {
 
 	tasks := make([]*Task, len(raw.Tasks))
 	for i, rawTask := range raw.Tasks {
-		if len(rawTask) != 1 {
-			return nil, fmt.Errorf("missing action")
+		task := &Task{}
+		metadata := mapstructure.Metadata{}
+		config := mapstructure.DecoderConfig{
+			Result:   task,
+			Metadata: &metadata,
+		}
+		decoder, err := mapstructure.NewDecoder(&config)
+		if err != nil {
+			return nil, err
 		}
 
-		var module Module
-		for k, v := range rawTask {
-			switch k {
-			case "file":
-				module = File()
-			default:
-				return nil, fmt.Errorf("unknown module: %s", k)
-			}
-
-			tasks[i] = NewTask(module, v)
-			break
+		if err := decoder.Decode(rawTask); err != nil {
+			return nil, err
 		}
+
+		if len(metadata.Unused) != 1 {
+			return nil, fmt.Errorf("requires exactly 1 extra attribute as the action")
+		}
+
+		name := config.Metadata.Unused[0]
+		switch name {
+		case "file":
+			task.module = File()
+		default:
+			return nil, fmt.Errorf("unknown module: %s", name)
+		}
+		task.config = rawTask[name]
+
+		tasks[i] = task
 	}
 
 	return &Plan{

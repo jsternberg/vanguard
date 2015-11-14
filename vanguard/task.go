@@ -3,6 +3,8 @@ package vanguard
 import "sync"
 
 type Task struct {
+	Name string
+
 	module Module
 	config interface{}
 

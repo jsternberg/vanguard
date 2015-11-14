@@ -1,5 +1,6 @@
 ---
 tasks:
-  - file:
+  - name: modify test.yml
+    file:
       path: test.yml
       mode: 0644
