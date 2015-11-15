@@ -16,6 +16,9 @@ type Runner struct {
 	wg sync.WaitGroup
 }
 
+// Instantiates a new runner and starts the underlying channels for reading
+// from the task channel and sending tasks to the prepare and execution
+// pipelines.
 func NewRunner(w io.Writer) *Runner {
 	if w == nil {
 		w = ioutil.Discard
@@ -61,11 +64,14 @@ func (r *Runner) execute() {
 	}
 }
 
+// Waits for all tasks to finish before returning. You must call
+// Close before calling Wait.
 func (r *Runner) Wait() error {
 	r.wg.Wait()
 	return nil
 }
 
+// Closes the input channel for new tasks.
 func (r *Runner) Close() error {
 	close(r.C)
 	return nil

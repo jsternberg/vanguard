@@ -34,7 +34,7 @@ func TestTask(t *testing.T) {
 
 	var wg sync.WaitGroup
 	module := &mock{}
-	task := NewTask(module, nil)
+	task := &Task{module: module}
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		go func() {

@@ -6,12 +6,20 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+// An idempotent unit of work for orchestrating a provision.
 type Module interface {
-	// Unique name of the module
+	// Unique name of the module.
 	Name() string
 
+	// Prepare the module for running. This will load the configuration,
+	// do error checking, and perform any actions that can be pipelined.
+	// The Prepare method should *never* perform an action. It should return
+	// true if the Run method should be invoked and an error if there is some
+	// problem.
 	Prepare(config interface{}) (bool, error)
 
+	// Invoke the module. This will always perform the action. The Prepare method
+	// must be called before Prepare.
 	Run() error
 }
 
@@ -20,6 +28,9 @@ type file struct {
 	Mode os.FileMode
 }
 
+// The "file" module.
+// The file module is used for creating and setting permissions
+// for a file on disk.
 func File() Module {
 	return &file{}
 }

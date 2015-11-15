@@ -9,10 +9,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// An interface for loading a plan from a reader.
+// The underlying parser of the reader is up to the specific
+// Loader implementation.
 type Loader interface {
+	// Loads the plan from the passed in reader.
+	// Returns an error if there's an underlying problem
+	// with the reader or a valid plan could not be loaded.
 	Load(r io.Reader) (*Plan, error)
 }
 
+// Loads a plan from a YAML document.
 type YamlLoader struct{}
 
 func (l *YamlLoader) Load(r io.Reader) (*Plan, error) {

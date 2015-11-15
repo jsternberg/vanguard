@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+// A thread-safe wrapper around a module with extra metadata
+// needed for all tasks.
 type Task struct {
 	Name string
 
@@ -18,13 +20,9 @@ type Task struct {
 	err      error
 }
 
-func NewTask(module Module, config interface{}) *Task {
-	return &Task{
-		module: module,
-		config: config,
-	}
-}
-
+// Runs the Prepare method from the underlying module and passes
+// in the task configuration. This will only invoke Prepare exactly once
+// and is thread-safe.
 func (t *Task) Prepare() (bool, error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
@@ -36,6 +34,7 @@ func (t *Task) Prepare() (bool, error) {
 	return t.changed, t.err
 }
 
+// Runs the underlying module. You must call Prepare before invoking this method.
 func (t *Task) Run(w io.Writer) error {
 	fmt.Fprintf(w, "Running %s[%s]\n", t.module.Name(), t.Name)
 	return t.module.Run()

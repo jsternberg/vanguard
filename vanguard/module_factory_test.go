@@ -27,7 +27,7 @@ func TestModuleFactory(t *testing.T) {
 func TestBuiltins(t *testing.T) {
 	assert := assert.New(t)
 
-	if module, err := DefaultModuleFactory.New("file"); assert.NoError(err) {
+	if module, err := NewModule("file"); assert.NoError(err) {
 		assert.IsType(File(), module)
 	}
 }

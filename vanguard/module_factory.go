@@ -2,20 +2,42 @@ package vanguard
 
 import "fmt"
 
-var DefaultModuleFactory = &moduleFactory{
-	builtins: make(map[string]ModuleFunc),
-}
+// The default module factory. All of the builtin
+// modules are automatically registered with this factory.
+var DefaultModuleFactory = NewModuleFactory()
 
 type ModuleFunc func() Module
 
+// A factory for instantiating new Module instances from
+// a registry.
 type ModuleFactory interface {
+	// Instantiate the Module registered with the name.
 	New(name string) (Module, error)
 
+	// Register a Module creation function. The name is inferred
+	// from the Module created from the ModuleFunc.
 	Register(f ModuleFunc)
+}
+
+// Create a new module from the DefaultModuleFactory.
+func NewModule(name string) (Module, error) {
+	return DefaultModuleFactory.New(name)
+}
+
+// Register a module with the DefaultModuleFactory.
+func RegisterModule(f ModuleFunc) {
+	DefaultModuleFactory.Register(f)
 }
 
 type moduleFactory struct {
 	builtins map[string]ModuleFunc
+}
+
+// Instantiate a new module factory with no default modules.
+func NewModuleFactory() ModuleFactory {
+	return &moduleFactory{
+		builtins: make(map[string]ModuleFunc),
+	}
 }
 
 func (mf *moduleFactory) New(name string) (Module, error) {
@@ -36,5 +58,5 @@ func (mf *moduleFactory) Register(f ModuleFunc) {
 }
 
 func init() {
-	DefaultModuleFactory.Register(File)
+	RegisterModule(File)
 }
