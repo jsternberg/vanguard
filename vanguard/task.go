@@ -34,8 +34,24 @@ func (t *Task) Prepare() (bool, error) {
 	return t.changed, t.err
 }
 
-// Runs the underlying module. You must call Prepare before invoking this method.
+// Runs the underlying module. This will invoke Prepare automatically
+// and will only call the underlying module if it needs to be changed.
 func (t *Task) Run(w io.Writer) error {
-	fmt.Fprintf(w, "Running %s[%s]\n", t.module.Name(), t.Name)
-	return t.module.Run()
+	changed, err := t.Prepare()
+	if err != nil {
+		fmt.Fprintf(w, "failed: %s[%s]\n  %s\n", t.module.Name(), t.Name, err)
+		return err
+	}
+
+	if !changed {
+		fmt.Fprintf(w, "ok: %s[%s]\n", t.module.Name(), t.Name)
+		return nil
+	}
+
+	if err := t.module.Run(); err != nil {
+		fmt.Fprintf(w, "failed: %s[%s]\n  %s\n", t.module.Name(), t.Name, err)
+		return err
+	}
+	fmt.Fprintf(w, "changed: %s[%s]\n", t.module.Name(), t.Name)
+	return nil
 }
