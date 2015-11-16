@@ -4,9 +4,26 @@ type Inventory struct {
 	hosts map[string]Host
 }
 
-type Host struct {
-	Name string
-	Addr string
+type Host interface {
+	Name() string
+	Addr() string
+}
+
+type staticHost struct {
+	name string
+	addr string
+}
+
+func StaticHost(name string, addr string) Host {
+	return &staticHost{name: name, addr: addr}
+}
+
+func (h *staticHost) Name() string {
+	return h.name
+}
+
+func (h *staticHost) Addr() string {
+	return h.addr
 }
 
 func NewInventory() *Inventory {
@@ -16,7 +33,7 @@ func NewInventory() *Inventory {
 }
 
 func (inventory *Inventory) AddHost(host Host) {
-	inventory.hosts[host.Name] = host
+	inventory.hosts[host.Name()] = host
 }
 
 func (inventory *Inventory) GetHost(name string) (Host, bool) {
